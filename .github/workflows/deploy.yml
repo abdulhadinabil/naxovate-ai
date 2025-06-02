@@ -7,20 +7,20 @@ on:
 jobs:
   deploy-functions:
     runs-on: ubuntu-latest
-    env:
-      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-      SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
-
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup Supabase CLI (unofficial)
+      - name: Setup Supabase CLI (official binary)
         run: |
-          rm -f supabase
-          curl -sL https://github.com/supabase/cli/releases/download/v1.0.0/supabase_1.0.0_linux_amd64.tar.gz | tar xz
+          curl -sL https://github.com/supabase/cli/releases/download/v1.161.1/supabase_1.161.1_linux_amd64.tar.gz -o cli.tar.gz
+          tar -xzf cli.tar.gz
           chmod +x supabase
-          sudo mv supabase /usr/local/bin/supabase
+          sudo mv supabase /usr/local/bin/
 
-      - name: Deploy Edge Function
+      - name: Deploy Edge Functions
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
         run: |
           supabase functions deploy generate-image --project-ref $SUPABASE_PROJECT_ID
+          supabase functions deploy edit-image --project-ref $SUPABASE_PROJECT_ID
